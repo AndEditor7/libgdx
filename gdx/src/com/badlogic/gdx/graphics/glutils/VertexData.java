@@ -28,7 +28,7 @@ import com.badlogic.gdx.utils.Disposable;
 public interface VertexData extends Disposable {
 
 	/** @return whether this VertexData is array or not */
-	public boolean isArray();
+	public boolean isArray ();
 
 	/** @return the number of vertices this VertexData stores */
 	public int getNumVertices ();

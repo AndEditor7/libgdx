@@ -90,7 +90,7 @@ public class VertexBufferObjectWithVAO implements VertexData {
 	}
 
 	@Override
-	public boolean isArray() {
+	public boolean isArray () {
 		return false;
 	}
 
@@ -152,7 +152,7 @@ public class VertexBufferObjectWithVAO implements VertexData {
 	}
 
 	@Override
-	public void setVertices(int[] vertices, int offset, int count) {
+	public void setVertices (int[] vertices, int offset, int count) {
 		isDirty = true;
 		((Buffer)byteBuffer).position(0);
 		BufferUtils.copy(vertices, offset, byteBuffer, count);
@@ -163,7 +163,7 @@ public class VertexBufferObjectWithVAO implements VertexData {
 	}
 
 	@Override
-	public void updateVertices(int targetOffset, int[] vertices, int sourceOffset, int count) {
+	public void updateVertices (int targetOffset, int[] vertices, int sourceOffset, int count) {
 		isDirty = true;
 		final int pos = byteBuffer.position();
 		((Buffer)byteBuffer).position(targetOffset * 4);

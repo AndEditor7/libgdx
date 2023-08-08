@@ -46,7 +46,7 @@ public class IndexArray implements IndexData {
 	}
 
 	@Override
-	public boolean isArray() {
+	public boolean isArray () {
 		return true;
 	}
 

@@ -80,7 +80,7 @@ public class VertexBufferObjectWithVAO implements VertexData {
 	}
 
 	@Override
-	public boolean isArray() {
+	public boolean isArray () {
 		return false;
 	}
 
@@ -126,12 +126,9 @@ public class VertexBufferObjectWithVAO implements VertexData {
 		setVertices(array.items, 0, count);
 
 		/*
-		isDirty = true;
-		BufferUtils.copy(vertices, buffer, count, offset);
-		buffer.position(0);
-		buffer.limit(count);
-		bufferChanged();
-		*/
+		 * isDirty = true; BufferUtils.copy(vertices, buffer, count, offset); buffer.position(0); buffer.limit(count);
+		 * bufferChanged();
+		 */
 	}
 
 	@Override
@@ -143,17 +140,13 @@ public class VertexBufferObjectWithVAO implements VertexData {
 		updateVertices(targetOffset, array.items, 0, count);
 
 		/*
-		isDirty = true;
-		final int pos = buffer.position();
-		buffer.position(targetOffset);
-		BufferUtils.copy(vertices, sourceOffset, count, buffer);
-		buffer.position(pos);
-		bufferChanged();
-		*/
+		 * isDirty = true; final int pos = buffer.position(); buffer.position(targetOffset); BufferUtils.copy(vertices,
+		 * sourceOffset, count, buffer); buffer.position(pos); bufferChanged();
+		 */
 	}
 
 	@Override
-	public void setVertices(int[] vertices, int offset, int count) {
+	public void setVertices (int[] vertices, int offset, int count) {
 		isDirty = true;
 		intBuffer.position(0);
 		BufferUtils.copy(vertices, offset, intBuffer, count);
@@ -165,7 +158,7 @@ public class VertexBufferObjectWithVAO implements VertexData {
 	}
 
 	@Override
-	public void updateVertices(int targetOffset, int[] vertices, int sourceOffset, int count) {
+	public void updateVertices (int targetOffset, int[] vertices, int sourceOffset, int count) {
 		isDirty = true;
 		intBuffer.position(targetOffset);
 		intBuffer.position(buffer.limit());

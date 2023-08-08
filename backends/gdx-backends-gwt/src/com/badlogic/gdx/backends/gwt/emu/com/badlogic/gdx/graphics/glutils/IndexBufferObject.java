@@ -75,7 +75,7 @@ public class IndexBufferObject implements IndexData {
 		usage = GL20.GL_STATIC_DRAW;
 	}
 
-	public boolean isArray() {
+	public boolean isArray () {
 		return false;
 	}
 

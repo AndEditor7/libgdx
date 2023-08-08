@@ -65,7 +65,7 @@ public class VertexArray implements VertexData {
 	}
 
 	@Override
-	public boolean isArray() {
+	public boolean isArray () {
 		return true;
 	}
 
@@ -106,10 +106,8 @@ public class VertexArray implements VertexData {
 		setVertices(array.items, 0, count);
 
 		/*
-		BufferUtils.copy(vertices, byteBuffer, count, offset);
-		((Buffer)buffer).position(0);
-		((Buffer)buffer).limit(count);
-		*/
+		 * BufferUtils.copy(vertices, byteBuffer, count, offset); ((Buffer)buffer).position(0); ((Buffer)buffer).limit(count);
+		 */
 	}
 
 	@Override
@@ -120,15 +118,13 @@ public class VertexArray implements VertexData {
 		}
 		updateVertices(targetOffset, array.items, 0, count);
 		/*
-		final int pos = byteBuffer.position();
-		((Buffer)byteBuffer).position(targetOffset * 4);
-		BufferUtils.copy(vertices, sourceOffset, count, byteBuffer);
-		((Buffer)byteBuffer).position(pos);
-		*/
+		 * final int pos = byteBuffer.position(); ((Buffer)byteBuffer).position(targetOffset * 4); BufferUtils.copy(vertices,
+		 * sourceOffset, count, byteBuffer); ((Buffer)byteBuffer).position(pos);
+		 */
 	}
 
 	@Override
-	public void setVertices(int[] vertices, int offset, int count) {
+	public void setVertices (int[] vertices, int offset, int count) {
 		((Buffer)byteBuffer).position(0);
 		BufferUtils.copy(vertices, offset, byteBuffer, count);
 		((Buffer)byteBuffer).position(0);
@@ -137,7 +133,7 @@ public class VertexArray implements VertexData {
 	}
 
 	@Override
-	public void updateVertices(int targetOffset, int[] vertices, int sourceOffset, int count) {
+	public void updateVertices (int targetOffset, int[] vertices, int sourceOffset, int count) {
 		final int pos = byteBuffer.position();
 		((Buffer)byteBuffer).position(targetOffset * 4);
 		BufferUtils.copy(vertices, sourceOffset, count, byteBuffer);

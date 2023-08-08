@@ -91,7 +91,7 @@ public class VertexBufferObjectSubData implements VertexData {
 	}
 
 	@Override
-	public boolean isArray() {
+	public boolean isArray () {
 		return false;
 	}
 
@@ -142,21 +142,12 @@ public class VertexBufferObjectSubData implements VertexData {
 		setVertices(array.items, 0, count);
 
 		/*
-		isDirty = true;
-		if (isDirect) {
-			BufferUtils.copy(vertices, byteBuffer, count, offset);
-			((Buffer)buffer).position(0);
-			((Buffer)buffer).limit(count);
-		} else {
-			((Buffer)buffer).clear();
-			buffer.put(vertices, offset, count);
-			((Buffer)buffer).flip();
-			((Buffer)byteBuffer).position(0);
-			((Buffer)byteBuffer).limit(buffer.limit() << 2);
-		}
-
-		bufferChanged();
-		*/
+		 * isDirty = true; if (isDirect) { BufferUtils.copy(vertices, byteBuffer, count, offset); ((Buffer)buffer).position(0);
+		 * ((Buffer)buffer).limit(count); } else { ((Buffer)buffer).clear(); buffer.put(vertices, offset, count);
+		 * ((Buffer)buffer).flip(); ((Buffer)byteBuffer).position(0); ((Buffer)byteBuffer).limit(buffer.limit() << 2); }
+		 * 
+		 * bufferChanged();
+		 */
 	}
 
 	@Override
@@ -168,21 +159,16 @@ public class VertexBufferObjectSubData implements VertexData {
 		updateVertices(targetOffset, array.items, 0, count);
 
 		/*
-		isDirty = true;
-		if (isDirect) {
-			final int pos = byteBuffer.position();
-			((Buffer)byteBuffer).position(targetOffset * 4);
-			BufferUtils.copy(vertices, sourceOffset, count, byteBuffer);
-			((Buffer)byteBuffer).position(pos);
-		} else
-			throw new GdxRuntimeException("Buffer must be allocated direct."); // Should never happen
-
-		bufferChanged();
-		*/
+		 * isDirty = true; if (isDirect) { final int pos = byteBuffer.position(); ((Buffer)byteBuffer).position(targetOffset * 4);
+		 * BufferUtils.copy(vertices, sourceOffset, count, byteBuffer); ((Buffer)byteBuffer).position(pos); } else throw new
+		 * GdxRuntimeException("Buffer must be allocated direct."); // Should never happen
+		 * 
+		 * bufferChanged();
+		 */
 	}
 
 	@Override
-	public void setVertices(int[] vertices, int offset, int count) {
+	public void setVertices (int[] vertices, int offset, int count) {
 		isDirty = true;
 		if (isDirect) {
 			((Buffer)byteBuffer).position(0);
@@ -204,7 +190,7 @@ public class VertexBufferObjectSubData implements VertexData {
 	}
 
 	@Override
-	public void updateVertices(int targetOffset, int[] vertices, int sourceOffset, int count) {
+	public void updateVertices (int targetOffset, int[] vertices, int sourceOffset, int count) {
 		isDirty = true;
 		if (isDirect) {
 			final int pos = byteBuffer.position();

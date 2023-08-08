@@ -87,7 +87,7 @@ public class IndexBufferObjectSubData implements IndexData {
 		return result;
 	}
 
-	public boolean isArray() {
+	public boolean isArray () {
 		return false;
 	}
 

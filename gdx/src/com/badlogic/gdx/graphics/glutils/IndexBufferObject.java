@@ -101,7 +101,7 @@ public class IndexBufferObject implements IndexData {
 	}
 
 	@Override
-	public boolean isArray() {
+	public boolean isArray () {
 		return false;
 	}
 

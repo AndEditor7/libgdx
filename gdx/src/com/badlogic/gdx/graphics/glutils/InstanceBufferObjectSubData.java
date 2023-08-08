@@ -175,7 +175,7 @@ public class InstanceBufferObjectSubData implements InstanceData {
 	}
 
 	@Override
-	public void setInstanceData(int[] data, int offset, int count) {
+	public void setInstanceData (int[] data, int offset, int count) {
 		isDirty = true;
 		if (isDirect) {
 			((Buffer)byteBuffer).position(0);
@@ -197,7 +197,7 @@ public class InstanceBufferObjectSubData implements InstanceData {
 	}
 
 	@Override
-	public void updateInstanceData(int targetOffset, int[] data, int sourceOffset, int count) {
+	public void updateInstanceData (int targetOffset, int[] data, int sourceOffset, int count) {
 		isDirty = true;
 		if (isDirect) {
 			final int pos = byteBuffer.position();

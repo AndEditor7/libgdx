@@ -25,7 +25,7 @@ import com.badlogic.gdx.utils.Disposable;
 public interface IndexData extends Disposable {
 
 	/** @return whether this IndexData is array or not */
-	public boolean isArray();
+	public boolean isArray ();
 
 	/** @return the number of indices currently stored in this buffer */
 	public int getNumIndices ();

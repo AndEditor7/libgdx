@@ -16,7 +16,6 @@
 
 package com.badlogic.gdx.graphics;
 
-import java.lang.StringBuilder;
 import java.nio.Buffer;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
@@ -199,7 +198,7 @@ public class Mesh implements Disposable {
 			this.instances = instances;
 		} else {
 			throw new GdxRuntimeException("Trying to enable InstancedRendering on same Mesh instance twice."
-					+ " Use disableInstancedRendering to clean up old InstanceData first");
+				+ " Use disableInstancedRendering to clean up old InstanceData first");
 		}
 		return this;
 	}
@@ -453,8 +452,8 @@ public class Mesh implements Disposable {
 		return getVertices(0, -1, vertices);
 	}
 
-	/** Copies the remaining vertices from the Mesh to the float array. The float array must be large enough to hold the
-	 * remaining vertices.
+	/** Copies the remaining vertices from the Mesh to the float array. The float array must be large enough to hold the remaining
+	 * vertices.
 	 * @param srcOffset the offset (in number of floats) of the vertices in the mesh to copy
 	 * @param vertices the array to copy the vertices to */
 	public float[] getVertices (int srcOffset, float[] vertices) {

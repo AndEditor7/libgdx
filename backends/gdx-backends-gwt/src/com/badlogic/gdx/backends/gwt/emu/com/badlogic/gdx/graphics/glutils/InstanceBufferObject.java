@@ -146,7 +146,7 @@ public class InstanceBufferObject implements InstanceData {
 	}
 
 	@Override
-	public void setInstanceData(int[] data, int offset, int count) {
+	public void setInstanceData (int[] data, int offset, int count) {
 		isDirty = true;
 		BufferUtils.copy(data, offset, byteBuffer, count);
 		buffer.position(0);
@@ -155,7 +155,7 @@ public class InstanceBufferObject implements InstanceData {
 	}
 
 	@Override
-	public void updateInstanceData(int targetOffset, int[] data, int sourceOffset, int count) {
+	public void updateInstanceData (int targetOffset, int[] data, int sourceOffset, int count) {
 		isDirty = true;
 		final int pos = byteBuffer.position();
 		byteBuffer.position(targetOffset * 4);
