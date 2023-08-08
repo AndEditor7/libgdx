@@ -87,6 +87,10 @@ public class IndexBufferObjectSubData implements IndexData {
 		return result;
 	}
 
+	public boolean isArray() {
+		return false;
+	}
+
 	/** @return the number of indices currently stored in this buffer */
 	public int getNumIndices () {
 		return buffer.limit();

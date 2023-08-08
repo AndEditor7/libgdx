@@ -26,6 +26,8 @@ import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.badlogic.gdx.utils.IntArray;
+import com.badlogic.gdx.utils.NumberUtils;
 
 /**
  * <p>
@@ -77,6 +79,11 @@ public class VertexBufferObject implements VertexData {
 
 		setBuffer(data, ownsBuffer, attributes);
 		setUsage(usage);
+	}
+
+	@Override
+	public boolean isArray() {
+		return false;
 	}
 
 	@Override
@@ -136,17 +143,58 @@ public class VertexBufferObject implements VertexData {
 		}
 	}
 
+	private final IntArray array = new IntArray(512);
+
 	@Override
 	public void setVertices (float[] vertices, int offset, int count) {
+		array.clear();
+		for (int i = 0; i < count; i++) {
+			array.add(NumberUtils.floatToIntBits(vertices[i + offset]));
+		}
+		setVertices(array.items, 0, count);
+
+		/*
 		isDirty = true;
 		BufferUtils.copy(vertices, byteBuffer, count, offset);
+		((Buffer)buffer).position(0);
+		((Buffer)buffer).limit(count);
+		bufferChanged();
+		*/
+	}
+
+	@Override
+	public void updateVertices (int targetOffset, float[] vertices, int sourceOffset, int count) {
+
+		array.clear();
+		for (int i = 0; i < count; i++) {
+			array.add(NumberUtils.floatToIntBits(vertices[i + sourceOffset]));
+		}
+		updateVertices(targetOffset, array.items, 0, count);
+
+		/*
+		isDirty = true;
+		final int pos = byteBuffer.position();
+		((Buffer)byteBuffer).position(targetOffset * 4);
+		BufferUtils.copy(vertices, sourceOffset, count, byteBuffer);
+		((Buffer)byteBuffer).position(pos);
+		((Buffer)buffer).position(0);
+		bufferChanged();
+		*/
+	}
+
+	@Override
+	public void setVertices(int[] vertices, int offset, int count) {
+		isDirty = true;
+		((Buffer)byteBuffer).position(0);
+		BufferUtils.copy(vertices, offset, byteBuffer, count);
+		((Buffer)byteBuffer).position(0);
 		((Buffer)buffer).position(0);
 		((Buffer)buffer).limit(count);
 		bufferChanged();
 	}
 
 	@Override
-	public void updateVertices (int targetOffset, float[] vertices, int sourceOffset, int count) {
+	public void updateVertices(int targetOffset, int[] vertices, int sourceOffset, int count) {
 		isDirty = true;
 		final int pos = byteBuffer.position();
 		((Buffer)byteBuffer).position(targetOffset * 4);

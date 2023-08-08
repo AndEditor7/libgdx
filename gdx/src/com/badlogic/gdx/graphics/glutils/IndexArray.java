@@ -45,6 +45,11 @@ public class IndexArray implements IndexData {
 		((Buffer)byteBuffer).flip();
 	}
 
+	@Override
+	public boolean isArray() {
+		return true;
+	}
+
 	/** @return the number of indices currently stored in this buffer */
 	public int getNumIndices () {
 		return empty ? 0 : buffer.limit();

@@ -19,6 +19,7 @@ package com.badlogic.gdx.graphics.glutils;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
@@ -26,6 +27,8 @@ import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.badlogic.gdx.utils.IntArray;
+import com.badlogic.gdx.utils.NumberUtils;
 
 /**
  * <p>
@@ -42,6 +45,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 public class VertexBufferObjectSubData implements VertexData {
 	final VertexAttributes attributes;
 	final FloatBuffer buffer;
+	final IntBuffer intBuffer;
 	final ByteBuffer byteBuffer;
 	int bufferHandle;
 	final boolean isDirect;
@@ -72,6 +76,7 @@ public class VertexBufferObjectSubData implements VertexData {
 
 		usage = isStatic ? GL20.GL_STATIC_DRAW : GL20.GL_DYNAMIC_DRAW;
 		buffer = byteBuffer.asFloatBuffer();
+		intBuffer = byteBuffer.asIntBuffer();
 		bufferHandle = createBufferObject();
 		((Buffer)buffer).flip();
 		((Buffer)byteBuffer).flip();
@@ -83,6 +88,11 @@ public class VertexBufferObjectSubData implements VertexData {
 		Gdx.gl20.glBufferData(GL20.GL_ARRAY_BUFFER, byteBuffer.capacity(), null, usage);
 		Gdx.gl20.glBindBuffer(GL20.GL_ARRAY_BUFFER, 0);
 		return result;
+	}
+
+	@Override
+	public boolean isArray() {
+		return false;
 	}
 
 	@Override
@@ -121,8 +131,17 @@ public class VertexBufferObjectSubData implements VertexData {
 		}
 	}
 
+	private final IntArray array = new IntArray(512);
+
 	@Override
 	public void setVertices (float[] vertices, int offset, int count) {
+		array.clear();
+		for (int i = 0; i < count; i++) {
+			array.add(NumberUtils.floatToIntBits(vertices[i + offset]));
+		}
+		setVertices(array.items, 0, count);
+
+		/*
 		isDirty = true;
 		if (isDirect) {
 			BufferUtils.copy(vertices, byteBuffer, count, offset);
@@ -137,10 +156,55 @@ public class VertexBufferObjectSubData implements VertexData {
 		}
 
 		bufferChanged();
+		*/
 	}
 
 	@Override
 	public void updateVertices (int targetOffset, float[] vertices, int sourceOffset, int count) {
+		array.clear();
+		for (int i = 0; i < count; i++) {
+			array.add(NumberUtils.floatToIntBits(vertices[i + sourceOffset]));
+		}
+		updateVertices(targetOffset, array.items, 0, count);
+
+		/*
+		isDirty = true;
+		if (isDirect) {
+			final int pos = byteBuffer.position();
+			((Buffer)byteBuffer).position(targetOffset * 4);
+			BufferUtils.copy(vertices, sourceOffset, count, byteBuffer);
+			((Buffer)byteBuffer).position(pos);
+		} else
+			throw new GdxRuntimeException("Buffer must be allocated direct."); // Should never happen
+
+		bufferChanged();
+		*/
+	}
+
+	@Override
+	public void setVertices(int[] vertices, int offset, int count) {
+		isDirty = true;
+		if (isDirect) {
+			((Buffer)byteBuffer).position(0);
+			BufferUtils.copy(vertices, offset, byteBuffer, count);
+			((Buffer)byteBuffer).position(0);
+			((Buffer)buffer).position(0);
+			((Buffer)buffer).limit(count);
+		} else {
+			((Buffer)intBuffer).clear();
+			intBuffer.put(vertices, offset, count);
+			((Buffer)intBuffer).flip();
+			((Buffer)buffer).position(0);
+			((Buffer)buffer).limit(intBuffer.limit());
+			((Buffer)byteBuffer).position(0);
+			((Buffer)byteBuffer).limit(intBuffer.limit() << 2);
+		}
+
+		bufferChanged();
+	}
+
+	@Override
+	public void updateVertices(int targetOffset, int[] vertices, int sourceOffset, int count) {
 		isDirty = true;
 		if (isDirect) {
 			final int pos = byteBuffer.position();

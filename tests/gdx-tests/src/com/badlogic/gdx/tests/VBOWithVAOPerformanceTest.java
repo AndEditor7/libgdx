@@ -337,6 +337,11 @@ public class VBOWithVAOPerformanceTest extends GdxTest {
 		}
 
 		@Override
+		public boolean isArray() {
+			return false;
+		}
+
+		@Override
 		public int getNumVertices () {
 			return buffer.limit() * 4 / attributes.vertexSize;
 		}
@@ -377,6 +382,28 @@ public class VBOWithVAOPerformanceTest extends GdxTest {
 
 		@Override
 		public void updateVertices (int targetOffset, float[] vertices, int sourceOffset, int count) {
+			isDirty = true;
+			final int pos = byteBuffer.position();
+			((Buffer)byteBuffer).position(targetOffset * 4);
+			BufferUtils.copy(vertices, sourceOffset, count, byteBuffer);
+			((Buffer)byteBuffer).position(pos);
+			((Buffer)buffer).position(0);
+			bufferChanged();
+		}
+
+		@Override
+		public void setVertices(int[] vertices, int offset, int count) {
+			isDirty = true;
+			((Buffer)byteBuffer).position(0);
+			BufferUtils.copy(vertices, offset, byteBuffer, count);
+			((Buffer)byteBuffer).position(0);
+			((Buffer)buffer).position(0);
+			((Buffer)buffer).limit(count);
+			bufferChanged();
+		}
+
+		@Override
+		public void updateVertices(int targetOffset, int[] vertices, int sourceOffset, int count) {
 			isDirty = true;
 			final int pos = byteBuffer.position();
 			((Buffer)byteBuffer).position(targetOffset * 4);

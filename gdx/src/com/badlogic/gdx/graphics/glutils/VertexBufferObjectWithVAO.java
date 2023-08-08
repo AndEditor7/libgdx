@@ -90,6 +90,11 @@ public class VertexBufferObjectWithVAO implements VertexData {
 	}
 
 	@Override
+	public boolean isArray() {
+		return false;
+	}
+
+	@Override
 	public VertexAttributes getAttributes () {
 		return attributes;
 	}
@@ -146,6 +151,28 @@ public class VertexBufferObjectWithVAO implements VertexData {
 		bufferChanged();
 	}
 
+	@Override
+	public void setVertices(int[] vertices, int offset, int count) {
+		isDirty = true;
+		((Buffer)byteBuffer).position(0);
+		BufferUtils.copy(vertices, offset, byteBuffer, count);
+		((Buffer)byteBuffer).position(0);
+		((Buffer)buffer).position(0);
+		((Buffer)buffer).limit(count);
+		bufferChanged();
+	}
+
+	@Override
+	public void updateVertices(int targetOffset, int[] vertices, int sourceOffset, int count) {
+		isDirty = true;
+		final int pos = byteBuffer.position();
+		((Buffer)byteBuffer).position(targetOffset * 4);
+		BufferUtils.copy(vertices, sourceOffset, count, byteBuffer);
+		((Buffer)byteBuffer).position(pos);
+		((Buffer)buffer).position(0);
+		bufferChanged();
+	}
+
 	/** Binds this VertexBufferObject for rendering via glDrawArrays or glDrawElements
 	 *
 	 * @param shader the shader */
@@ -162,7 +189,7 @@ public class VertexBufferObjectWithVAO implements VertexData {
 
 		bindAttributes(shader, locations);
 
-		// if our data has changed upload it:
+		// if our data has changed, upload it:
 		bindData(gl);
 
 		isBound = true;

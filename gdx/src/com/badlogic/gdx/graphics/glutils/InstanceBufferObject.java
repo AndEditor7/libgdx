@@ -22,6 +22,8 @@ import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.badlogic.gdx.utils.IntArray;
+import com.badlogic.gdx.utils.NumberUtils;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
@@ -117,13 +119,23 @@ public class InstanceBufferObject implements InstanceData {
 		}
 	}
 
+	private final IntArray array = new IntArray(512);
+
 	@Override
 	public void setInstanceData (float[] data, int offset, int count) {
+		array.clear();
+		for (int i = 0; i < count; i++) {
+			array.add(NumberUtils.floatToIntBits(data[i + offset]));
+		}
+		setInstanceData(array.items, 0, count);
+
+		/*
 		isDirty = true;
 		BufferUtils.copy(data, byteBuffer, count, offset);
 		((Buffer)buffer).position(0);
 		((Buffer)buffer).limit(count);
 		bufferChanged();
+		*/
 	}
 
 	@Override
@@ -137,6 +149,34 @@ public class InstanceBufferObject implements InstanceData {
 
 	@Override
 	public void updateInstanceData (int targetOffset, float[] data, int sourceOffset, int count) {
+		array.clear();
+		for (int i = 0; i < count; i++) {
+			array.add(NumberUtils.floatToIntBits(data[i + sourceOffset]));
+		}
+		updateInstanceData(targetOffset, array.items, 0, count);
+
+		/*
+		isDirty = true;
+		final int pos = byteBuffer.position();
+		((Buffer)byteBuffer).position(targetOffset * 4);
+		BufferUtils.copy(data, sourceOffset, count, byteBuffer);
+		((Buffer)byteBuffer).position(pos);
+		((Buffer)buffer).position(0);
+		bufferChanged();
+		*/
+	}
+
+	@Override
+	public void setInstanceData(int[] data, int offset, int count) {
+		isDirty = true;
+		BufferUtils.copy(data, offset, byteBuffer, count);
+		((Buffer)buffer).position(0);
+		((Buffer)buffer).limit(count);
+		bufferChanged();
+	}
+
+	@Override
+	public void updateInstanceData(int targetOffset, int[] data, int sourceOffset, int count) {
 		isDirty = true;
 		final int pos = byteBuffer.position();
 		((Buffer)byteBuffer).position(targetOffset * 4);

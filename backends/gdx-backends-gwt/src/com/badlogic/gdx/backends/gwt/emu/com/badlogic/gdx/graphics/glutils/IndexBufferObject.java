@@ -75,6 +75,10 @@ public class IndexBufferObject implements IndexData {
 		usage = GL20.GL_STATIC_DRAW;
 	}
 
+	public boolean isArray() {
+		return false;
+	}
+
 	/** @return the number of indices currently stored in this buffer */
 	public int getNumIndices () {
 		return buffer.limit();

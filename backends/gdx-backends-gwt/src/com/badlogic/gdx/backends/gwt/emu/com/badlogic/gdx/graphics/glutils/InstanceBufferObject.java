@@ -146,6 +146,26 @@ public class InstanceBufferObject implements InstanceData {
 	}
 
 	@Override
+	public void setInstanceData(int[] data, int offset, int count) {
+		isDirty = true;
+		BufferUtils.copy(data, offset, byteBuffer, count);
+		buffer.position(0);
+		buffer.limit(count);
+		bufferChanged();
+	}
+
+	@Override
+	public void updateInstanceData(int targetOffset, int[] data, int sourceOffset, int count) {
+		isDirty = true;
+		final int pos = byteBuffer.position();
+		byteBuffer.position(targetOffset * 4);
+		BufferUtils.copy(data, sourceOffset, count, byteBuffer);
+		byteBuffer.position(pos);
+		buffer.position(0);
+		bufferChanged();
+	}
+
+	@Override
 	public void updateInstanceData (int targetOffset, FloatBuffer data, int sourceOffset, int count) {
 		isDirty = true;
 		final int pos = byteBuffer.position();

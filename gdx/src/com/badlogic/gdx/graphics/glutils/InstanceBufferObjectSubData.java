@@ -26,6 +26,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 
 /** Modification of the {@link VertexBufferObjectSubData} class. Sets the glVertexAttribDivisor for every {@link VertexAttribute}
  * automatically.
@@ -35,6 +36,7 @@ public class InstanceBufferObjectSubData implements InstanceData {
 
 	final VertexAttributes attributes;
 	final FloatBuffer buffer;
+	final IntBuffer intBuffer;
 	final ByteBuffer byteBuffer;
 	int bufferHandle;
 	final boolean isDirect;
@@ -65,6 +67,7 @@ public class InstanceBufferObjectSubData implements InstanceData {
 
 		usage = isStatic ? GL20.GL_STATIC_DRAW : GL20.GL_DYNAMIC_DRAW;
 		buffer = byteBuffer.asFloatBuffer();
+		intBuffer = byteBuffer.asIntBuffer();
 		bufferHandle = createBufferObject();
 		((Buffer)buffer).flip();
 		((Buffer)byteBuffer).flip();
@@ -159,6 +162,42 @@ public class InstanceBufferObjectSubData implements InstanceData {
 
 	@Override
 	public void updateInstanceData (int targetOffset, float[] data, int sourceOffset, int count) {
+		isDirty = true;
+		if (isDirect) {
+			final int pos = byteBuffer.position();
+			((Buffer)byteBuffer).position(targetOffset * 4);
+			BufferUtils.copy(data, sourceOffset, count, byteBuffer);
+			((Buffer)byteBuffer).position(pos);
+		} else
+			throw new GdxRuntimeException("Buffer must be allocated direct."); // Should never happen
+
+		bufferChanged();
+	}
+
+	@Override
+	public void setInstanceData(int[] data, int offset, int count) {
+		isDirty = true;
+		if (isDirect) {
+			((Buffer)byteBuffer).position(0);
+			BufferUtils.copy(data, offset, byteBuffer, count);
+			((Buffer)byteBuffer).position(0);
+			((Buffer)buffer).position(0);
+			((Buffer)buffer).limit(count);
+		} else {
+			((Buffer)intBuffer).clear();
+			intBuffer.put(data, offset, count);
+			((Buffer)intBuffer).flip();
+			((Buffer)buffer).position(0);
+			((Buffer)buffer).limit(intBuffer.limit());
+			((Buffer)byteBuffer).position(0);
+			((Buffer)byteBuffer).limit(intBuffer.limit() << 2);
+		}
+
+		bufferChanged();
+	}
+
+	@Override
+	public void updateInstanceData(int targetOffset, int[] data, int sourceOffset, int count) {
 		isDirty = true;
 		if (isDirect) {
 			final int pos = byteBuffer.position();

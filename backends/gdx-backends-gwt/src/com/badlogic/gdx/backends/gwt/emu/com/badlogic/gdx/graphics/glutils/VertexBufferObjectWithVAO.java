@@ -1,6 +1,7 @@
 
 package com.badlogic.gdx.graphics.glutils;
 
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
@@ -11,6 +12,7 @@ import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.IntArray;
+import com.badlogic.gdx.utils.NumberUtils;
 
 /**
  * <p>
@@ -35,6 +37,7 @@ public class VertexBufferObjectWithVAO implements VertexData {
 
 	final VertexAttributes attributes;
 	final FloatBuffer buffer;
+	final IntBuffer intBuffer;
 	int bufferHandle;
 	final boolean isStatic;
 	final int usage;
@@ -61,8 +64,11 @@ public class VertexBufferObjectWithVAO implements VertexData {
 		this.isStatic = isStatic;
 		this.attributes = attributes;
 
-		buffer = BufferUtils.newFloatBuffer(this.attributes.vertexSize / 4 * numVertices);
+		ByteBuffer byteBuffer = BufferUtils.newByteBuffer(this.attributes.vertexSize * numVertices);
+		buffer = byteBuffer.asFloatBuffer();
 		buffer.flip();
+		intBuffer = byteBuffer.asIntBuffer();
+		intBuffer.flip();
 		bufferHandle = Gdx.gl20.glGenBuffer();
 		usage = isStatic ? GL20.GL_STATIC_DRAW : GL20.GL_DYNAMIC_DRAW;
 		createVAO();
@@ -71,6 +77,11 @@ public class VertexBufferObjectWithVAO implements VertexData {
 	@Override
 	public VertexAttributes getAttributes () {
 		return attributes;
+	}
+
+	@Override
+	public boolean isArray() {
+		return false;
 	}
 
 	@Override
@@ -104,22 +115,62 @@ public class VertexBufferObjectWithVAO implements VertexData {
 		}
 	}
 
+	private final IntArray array = new IntArray(512);
+
 	@Override
 	public void setVertices (float[] vertices, int offset, int count) {
+		array.clear();
+		for (int i = 0; i < count; i++) {
+			array.add(NumberUtils.floatToIntBits(vertices[i + offset]));
+		}
+		setVertices(array.items, 0, count);
+
+		/*
 		isDirty = true;
 		BufferUtils.copy(vertices, buffer, count, offset);
+		buffer.position(0);
+		buffer.limit(count);
+		bufferChanged();
+		*/
+	}
+
+	@Override
+	public void updateVertices (int targetOffset, float[] vertices, int sourceOffset, int count) {
+		array.clear();
+		for (int i = 0; i < count; i++) {
+			array.add(NumberUtils.floatToIntBits(vertices[i + sourceOffset]));
+		}
+		updateVertices(targetOffset, array.items, 0, count);
+
+		/*
+		isDirty = true;
+		final int pos = buffer.position();
+		buffer.position(targetOffset);
+		BufferUtils.copy(vertices, sourceOffset, count, buffer);
+		buffer.position(pos);
+		bufferChanged();
+		*/
+	}
+
+	@Override
+	public void setVertices(int[] vertices, int offset, int count) {
+		isDirty = true;
+		intBuffer.position(0);
+		BufferUtils.copy(vertices, offset, intBuffer, count);
+		intBuffer.position(0);
+		intBuffer.limit(count);
 		buffer.position(0);
 		buffer.limit(count);
 		bufferChanged();
 	}
 
 	@Override
-	public void updateVertices (int targetOffset, float[] vertices, int sourceOffset, int count) {
+	public void updateVertices(int targetOffset, int[] vertices, int sourceOffset, int count) {
 		isDirty = true;
-		final int pos = buffer.position();
-		buffer.position(targetOffset);
-		BufferUtils.copy(vertices, sourceOffset, count, buffer);
-		buffer.position(pos);
+		intBuffer.position(targetOffset);
+		intBuffer.position(buffer.limit());
+		BufferUtils.copy(vertices, sourceOffset, count, intBuffer);
+		buffer.limit(intBuffer.limit());
 		bufferChanged();
 	}
 
@@ -139,7 +190,7 @@ public class VertexBufferObjectWithVAO implements VertexData {
 
 		bindAttributes(shader, locations);
 
-		// if our data has changed upload it:
+		// if our data has changed, upload it:
 		bindData(gl);
 
 		isBound = true;

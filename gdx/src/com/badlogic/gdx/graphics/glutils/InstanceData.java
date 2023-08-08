@@ -55,6 +55,24 @@ public interface InstanceData extends Disposable {
 	public void updateInstanceData (int targetOffset, float[] data, int sourceOffset, int count);
 
 	/** Sets the vertices of this InstanceData, discarding the old vertex data. The count must equal the number of floats per
+	 * vertex times the number of vertices to be copied to this VertexData. The order of the vertex attributes must be the same as
+	 * specified at construction time via {@link VertexAttributes}.
+	 * <p>
+	 * This can be called in between calls to bind and unbind. The vertex data will be updated instantly.
+	 *
+	 * @param data the instance data
+	 * @param offset the offset to start copying the data from
+	 * @param count the number of ints to copy */
+	public void setInstanceData (int[] data, int offset, int count);
+
+	/** Update (a portion of) the vertices. Does not resize the backing buffer.
+	 *
+	 * @param data the instance data
+	 * @param sourceOffset the offset to start copying the data from
+	 * @param count the number of ints to copy */
+	public void updateInstanceData (int targetOffset, int[] data, int sourceOffset, int count);
+
+	/** Sets the vertices of this InstanceData, discarding the old vertex data. The count must equal the number of floats per
 	 * vertex times the number of vertices to be copied to this InstanceData. The order of the vertex attributes must be the same
 	 * as specified at construction time via {@link VertexAttributes}.
 	 * <p>

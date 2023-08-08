@@ -23,6 +23,10 @@ import com.badlogic.gdx.utils.Disposable;
 /** An IndexData instance holds index data. Can be either a plain short buffer or an OpenGL buffer object.
  * @author mzechner */
 public interface IndexData extends Disposable {
+
+	/** @return whether this IndexData is array or not */
+	public boolean isArray();
+
 	/** @return the number of indices currently stored in this buffer */
 	public int getNumIndices ();
 

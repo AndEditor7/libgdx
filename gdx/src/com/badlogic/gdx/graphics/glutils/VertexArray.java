@@ -24,6 +24,8 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.utils.BufferUtils;
+import com.badlogic.gdx.utils.IntArray;
+import com.badlogic.gdx.utils.NumberUtils;
 
 /**
  * <p>
@@ -63,6 +65,11 @@ public class VertexArray implements VertexData {
 	}
 
 	@Override
+	public boolean isArray() {
+		return true;
+	}
+
+	@Override
 	public void dispose () {
 		BufferUtils.disposeUnsafeByteBuffer(byteBuffer);
 	}
@@ -88,15 +95,49 @@ public class VertexArray implements VertexData {
 		return byteBuffer.capacity() / attributes.vertexSize;
 	}
 
+	private final IntArray array = new IntArray(512);
+
 	@Override
 	public void setVertices (float[] vertices, int offset, int count) {
+		array.clear();
+		for (int i = 0; i < count; i++) {
+			array.add(NumberUtils.floatToIntBits(vertices[i + offset]));
+		}
+		setVertices(array.items, 0, count);
+
+		/*
 		BufferUtils.copy(vertices, byteBuffer, count, offset);
+		((Buffer)buffer).position(0);
+		((Buffer)buffer).limit(count);
+		*/
+	}
+
+	@Override
+	public void updateVertices (int targetOffset, float[] vertices, int sourceOffset, int count) {
+		array.clear();
+		for (int i = 0; i < count; i++) {
+			array.add(NumberUtils.floatToIntBits(vertices[i + sourceOffset]));
+		}
+		updateVertices(targetOffset, array.items, 0, count);
+		/*
+		final int pos = byteBuffer.position();
+		((Buffer)byteBuffer).position(targetOffset * 4);
+		BufferUtils.copy(vertices, sourceOffset, count, byteBuffer);
+		((Buffer)byteBuffer).position(pos);
+		*/
+	}
+
+	@Override
+	public void setVertices(int[] vertices, int offset, int count) {
+		((Buffer)byteBuffer).position(0);
+		BufferUtils.copy(vertices, offset, byteBuffer, count);
+		((Buffer)byteBuffer).position(0);
 		((Buffer)buffer).position(0);
 		((Buffer)buffer).limit(count);
 	}
 
 	@Override
-	public void updateVertices (int targetOffset, float[] vertices, int sourceOffset, int count) {
+	public void updateVertices(int targetOffset, int[] vertices, int sourceOffset, int count) {
 		final int pos = byteBuffer.position();
 		((Buffer)byteBuffer).position(targetOffset * 4);
 		BufferUtils.copy(vertices, sourceOffset, count, byteBuffer);
